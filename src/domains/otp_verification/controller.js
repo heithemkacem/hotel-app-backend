@@ -111,8 +111,8 @@ const verifyOTPModifyPassword = async ({ userID, otp }) => {
       //Empty details are not allowed
     } else {
       //transfor userId to a integer
-      const existingRecord = await OTPVerification.find({ userID });
-      if (existingRecord.length > 0) {
+      const existingRecord = await OTPVerification.findOne({ userID: userID });
+      if (existingRecord != null) {
         //todo User Verification Record Exist So We Procced
         const expiresAt = existingRecord.expiresAt;
         const hashedOTP = existingRecord.otp;
