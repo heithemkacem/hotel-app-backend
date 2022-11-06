@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend for NEARVOTE app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -r dotenv/config src/index.js dotenv_config_path=env/local.env "
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-jwt": "^6.1.1",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.2.2",
+    "nodemailer": "^6.7.2",
+    "nodemon": "^2.0.15",
+    "otp-generator": "^4.0.0",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0",
+    "twilio": "^3.77.0",
+    "uuid": "^8.3.2"
+  },
+  "author": "Heithem Kacem",
+  "license": "ISC"
+}
