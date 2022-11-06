@@ -7,7 +7,6 @@ const {
   sendOTPVerificationEmail,
 } = require("./../otp_verification/controller");
 const { ROLES } = require("./../../security/role");
-
 const createClient = async (data) => {
   try {
     const { username, firstName, lastName, email, phone, password } = data;
@@ -120,4 +119,68 @@ const ResetPassword = async (newPassword, email) => {
   }
 };
 
-module.exports = { createClient, clientForgetPassword, ResetPassword };
+const ModifyPasswordFromDashboard = async (id, oldPassword, newPassword) => {
+  try {
+    const newHashedPassword = await hashData(newPassword);
+    const fetchedHotel = await Hotel.findOne({ _id: id });
+    const fetchedClient = await Client.findOne({ _id: id });
+    const fetchedAdmin = await Admin.findOne({ _id: id });
+    if (fetchedClient != null) {
+      const hashedPassword = fetchedClient.password;
+      const ComparedPassword = await verifyHashedData(
+        oldPassword,
+        hashedPassword
+      );
+      if (ComparedPassword) {
+        Client.updateOne({ password: newHashedPassword }, { _id: id });
+        return {
+          status: "Success",
+          message: "common:Password changed",
+        };
+      } else {
+        throw Error("common:old_password_is_incorrect");
+      }
+    } else if (fetchedHotel != null) {
+      const hashedPassword = fetchedHotel.password;
+      const ComparedPassword = await verifyHashedData(
+        oldPassword,
+        hashedPassword
+      );
+      if (ComparedPassword) {
+        Hotel.updateOne({ password: newHashedPassword }, { _id: id });
+        return {
+          status: "Success",
+          message: "common:Password changed",
+        };
+      } else {
+        throw Error("common:old_password_is_incorrect");
+      }
+    } else if (fetchedAdmin != null) {
+      const hashedPassword = fetchedAdmin.password;
+      const ComparedPassword = await verifyHashedData(
+        oldPassword,
+        hashedPassword
+      );
+      if (ComparedPassword) {
+        Admin.updateOne({ password: newHashedPassword }, { _id: id });
+        return {
+          status: "Success",
+          message: "common:Password changed",
+        };
+      } else {
+        throw Error("common:old_password_is_incorrect");
+      }
+    } else {
+      throw Error("common:email_does_not_exist");
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = {
+  createClient,
+  clientForgetPassword,
+  ResetPassword,
+  ModifyPasswordFromDashboard,
+};

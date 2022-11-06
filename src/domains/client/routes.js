@@ -6,6 +6,7 @@ const {
   createClient,
   clientForgetPassword,
   ResetPassword,
+  ModifyPasswordFromDashboard,
 } = require("./controller");
 //Passport
 const passport = require("passport");
@@ -83,62 +84,33 @@ router.post("/reset-password", async (req, res) => {
 });
 
 // User change password from dashboard
-router.post(
-  "/reset_password",
-  passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
-    try {
-      const { id, oldPassword, newPassword, confirmNewPassword } = req.body;
-      const hashedPassword = await hashData(newPassword);
-      Client.findOne({ _id: id })
-        .then(async function (user) {
-          if (!user) {
-            res.json({
-              status: "Failed",
-              message: "common:email_does_not_exist",
-            });
-          } else {
-            if (newPassword == oldPassword) {
-              res.json({
-                status: "Failed",
-                message: "common:new_password_is_the_same_as_old_password",
-              });
-            } else if (newPassword != confirmNewPassword) {
-              res.json({
-                status: "Failed",
-                message:
-                  "common:new_password_and_confirm_new_password_are_not_same",
-              });
-            } else {
-              const ComparedPassword = await verifyHashedData(
-                oldPassword,
-                user.password
-              );
-              if (ComparedPassword == true) {
-                Client.updateOne({ password: hashedPassword }, { _id: id });
-                res.json({
-                  status: "Success",
-                  message: "common:Password changed",
-                });
-              } else {
-                res.json({
-                  status: "Failed",
-                  message: "common:old_password_is_incorrect",
-                });
-              }
-            }
-          }
-        })
-        .catch((error) => {
-          throw error;
-        });
-    } catch (error) {
+router.post("/reset_password", async (req, res) => {
+  try {
+    const { id, oldPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (newPassword == oldPassword) {
       res.json({
         status: "Failed",
-        message: error.message,
+        message: "common:new_password_is_the_same_as_old_password",
+      });
+    } else if (newPassword != confirmNewPassword) {
+      res.json({
+        status: "Failed",
+        message: "common:new_password_and_confirm_new_password_are_not_same",
       });
     }
+    const modifiedUser = await ModifyPasswordFromDashboard(
+      id,
+      oldPassword,
+      newPassword
+    );
+    res.send(modifiedUser);
+  } catch (error) {
+    res.json({
+      status: "Failed",
+      message: error.message,
+    });
   }
-);
+});
 
 module.exports = router;
