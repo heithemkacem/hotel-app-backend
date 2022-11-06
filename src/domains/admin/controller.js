@@ -20,7 +20,7 @@ const createAdmin = async (data) => {
       existingAdmin != null
     ) {
       //A user aleady exist
-      throw Error("Email aleardy in use");
+      throw Error("common:Email_already_in_use");
     } else {
       //User doesn't exist so we can save him as a new user
       //Hashing Password
@@ -56,7 +56,7 @@ const authenticate = async (email, password) => {
         hashedPasswordClient
       );
       if (passwordMatchClient === false) {
-        throw Error("Incorrect credentials match");
+        throw Error("common:Invalid_credentials");
       } else {
         if (!fetchedClient.verified) {
           await sendOTPVerificationEmail(fetchedClient);
@@ -93,7 +93,7 @@ const authenticate = async (email, password) => {
         hashedPasswordHotel
       );
       if (passwordMatchHotel === false) {
-        throw Error("Incorrect credentials match");
+        throw Error("common:Invalid_credentials");
       } else {
         if (!fetchedHotel.verified) {
           const _id = fetchedHotel._id;
@@ -129,7 +129,7 @@ const authenticate = async (email, password) => {
       const hashedPassword = fetchedAdmin.password;
       const passwordMatch = await verifyHashedData(password, hashedPassword);
       if (passwordMatch === false) {
-        throw Error("Incorrect credentials match");
+        throw Error("common:Invalid_credentials");
       } else {
         if (!fetchedAdmin.verified) {
           await sendOTPVerificationEmail(fetchedAdmin);
@@ -159,7 +159,7 @@ const authenticate = async (email, password) => {
         };
       }
     } else {
-      throw Error("Incorrect credentials match");
+      throw Error("common:Invalid_credentials");
     }
   } catch (error) {
     throw error;
@@ -192,7 +192,7 @@ const createHotel = async (data) => {
       existingAdmin != null
     ) {
       //A user aleady exist
-      throw Error("Email aleardy in use");
+      throw Error("common:Email_already_in_use");
     } else {
       //Hotel doesn't exist so we can save him as a new user
       //Hashing Password
@@ -236,7 +236,7 @@ const updateHotel = async (id, data) => {
     //find the hotel by id
     const hotel = await Hotel.findById(id);
     if (!hotel) {
-      throw Error("Hotel not found");
+      throw Error("common:Hotel_not_found");
     }
     //update the hotel
     const updatedHotel = await Hotel.findByIdAndUpdate(id, data, {

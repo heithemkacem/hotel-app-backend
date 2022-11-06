@@ -20,7 +20,7 @@ const createClient = async (data) => {
       existingAdmin != null
     ) {
       //A user aleady exist
-      throw Error("email aleardy in use");
+      throw Error("common:email_already_in_use");
     } else {
       //User doesn't exist so we can save him as a new user
       //Hashing Password
@@ -85,7 +85,7 @@ const ResetPassword = async (newPassword, email) => {
         );
         return { status: "Success", message: "Password changed" };
       } else {
-        throw Error("Password already in use");
+        throw Error("common:password_is_same");
       }
     } else if (fetchedHotel != null) {
       const hashedPassword = fetchedHotel.password;
@@ -97,7 +97,7 @@ const ResetPassword = async (newPassword, email) => {
         );
         return { status: "Success", message: "Password changed" };
       } else {
-        throw Error("Password already in use");
+        throw Error("common:password_is_same");
       }
     } else if (fetchedAdmin != null) {
       const hashedPassword = fetchedAdmin.password;
@@ -109,7 +109,7 @@ const ResetPassword = async (newPassword, email) => {
         );
         return { status: "Success", message: "Password changed" };
       } else {
-        throw Error("Password already in use");
+        throw Error("common:password_is_same");
       }
     } else {
       throw Error("common:email_does_not_exist");
