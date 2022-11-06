@@ -69,7 +69,7 @@ const clientForgetPassword = async (email) => {
   }
 };
 
-const ResetPassword = async (email, newPassword) => {
+const ResetPassword = async (newPassword, email) => {
   try {
     const hashedPasswordUser = await hashData(newPassword);
     const fetchedHotel = await Hotel.findOne({ hotelEmail: email });
@@ -78,6 +78,7 @@ const ResetPassword = async (email, newPassword) => {
     if (fetchedClient != null) {
       const hashedPassword = fetchedClient.password;
       const passwordMatch = await verifyHashedData(newPassword, hashedPassword);
+      console.log(passwordMatch);
       if (passwordMatch === false) {
         await Client.updateOne(
           { email: email },

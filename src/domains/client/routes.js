@@ -71,7 +71,7 @@ router.post("/reset-password", async (req, res) => {
     if (newPassword != confirmNewPassword) {
       throw Error("Passwords must match");
     } else {
-      const updatedUser = await ResetPassword(email, newPassword);
+      const updatedUser = await ResetPassword(newPassword, email);
       res.send(updatedUser);
     }
   } catch (error) {

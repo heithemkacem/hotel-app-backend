@@ -47,7 +47,7 @@ const sendOTPVerificationEmail = async ({ _id, email }) => {
   }
 };
 
-const verifyOTPEmail = async ({ userID, otp }) => {
+const verifyOTPEmail = async (userID, otp) => {
   try {
     if (!otp || !userID) {
       throw Error("common:empty_details_are_not_allowed");
@@ -105,7 +105,7 @@ const verifyOTPEmail = async ({ userID, otp }) => {
   }
 };
 
-const verifyOTPModifyPassword = async ({ userID, otp }) => {
+const verifyOTPModifyPassword = async (userID, otp) => {
   try {
     if (!otp || !userID) {
       throw Error("common:Empty_details_are_not_allowed");
@@ -147,7 +147,7 @@ const verifyOTPModifyPassword = async ({ userID, otp }) => {
   }
 };
 
-const resendOTP = async ({ userID, email }) => {
+const resendOTP = async (userID, email) => {
   try {
     if (!userID || !email) {
       throw Error("common:Empty_details_are_not_allowed");
