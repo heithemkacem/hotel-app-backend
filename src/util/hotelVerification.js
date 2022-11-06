@@ -38,22 +38,21 @@ const hotelRegisterValidation = (data) => {
       "string.empty": `common:Enter_a_valid_hotel_image`,
     }),
     hotelEmail: joi.string().required().email().messages({
-      "string.empty": "common:Merci_d_entrer_un_email_valide",
-      "string.email": "common:Merci_d_entrer_un_email_valide",
+      "string.empty": "common:enter_valid_email",
+      "string.email": "common:enter_valid_email",
     }),
     password: joi.string().required().min(8).max(26).messages({
-      "string.empty": "common:Merci_d_entrer_un_mot_de_passe_valide",
-      "string.min": "common:Merci_d_entrer_un_mot_de_passe_de_min_8_caractères",
-      "string.max":
-        "common:Merci_d_entrer_un_mot_de_passe_de_max_26_caractères",
+      "string.empty": "common:enter_valid_password",
+      "string.min": "common:enter_valid_password_min_8_characters",
+      "string.max": "common:enter_valid_password_max_8_characters",
     }),
     confirmPassword: joi
       .string()
       .required()
       .valid(joi.ref("password"))
       .messages({
-        "string.empty": "common:Merci_d_entrer_un_mot_de_passe_valide",
-        "any.only": "common:Les_mots_de_passe_ne_correspondent_pas",
+        "string.empty": "common:enter_valid_password",
+        "any.only": "common:password_does_not_match",
       }),
   });
   return schemaValidation.validate(data);
