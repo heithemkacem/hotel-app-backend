@@ -70,7 +70,7 @@ router.post("/reset-password", async (req, res) => {
   try {
     const { newPassword, confirmNewPassword, email } = req.body;
     if (newPassword != confirmNewPassword) {
-      throw Error("Passwords must match");
+      throw Error("common:passwords_do_not_match");
     } else {
       const updatedUser = await ResetPassword(newPassword, email);
       res.send(updatedUser);
