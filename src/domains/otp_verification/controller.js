@@ -9,6 +9,7 @@ const otpGenerator = require("otp-generator");
 //! Still Not Tested need testes
 const sendOTPVerificationEmail = async ({ _id, email }) => {
   try {
+    const id = _id;
     //url to be used in the email
     const otp = otpGenerator.generate(4, {
       upperCaseAlphabets: false,
@@ -30,7 +31,7 @@ const sendOTPVerificationEmail = async ({ _id, email }) => {
     const hashedOTP = await hashData(otp);
     //set values in userVerification collection
     const UserVerification = new OTPVerification({
-      userID: _id,
+      userID: id,
       otp: hashedOTP,
       createdAt: Date.now(),
       expiresAt: Date.now() + 300000,
@@ -38,7 +39,7 @@ const sendOTPVerificationEmail = async ({ _id, email }) => {
     await UserVerification.save();
     await sendEmail(mailOptions);
     return {
-      UserID: _id,
+      UserID: id,
       email: email,
     };
   } catch (error) {
@@ -62,7 +63,7 @@ const verifyOTPEmail = async ({ userID, otp }) => {
         var currentTime = new Date();
         if (expiresAt < currentTime) {
           //!Record has expired
-          await OTPVerification.deleteMany({ userID });
+          await OTPVerification.deleteMany({ userID: userID });
           let message = "common:OTP_has_expired";
           //OTP has expired,Please signup again
           throw new Error(message);
@@ -72,7 +73,7 @@ const verifyOTPEmail = async ({ userID, otp }) => {
           const matchString = await verifyHashedData(otp, hashedOTP);
           //todo Strings match
           if (matchString) {
-            await OTPVerification.deleteMany({ userID });
+            await OTPVerification.deleteMany({ userID: userID });
             //transform id to integer
             const fetchedHotel = await Hotel.findOne({ _id: userID });
             const fetchedClient = await Client.findOne({ _id: userID });
@@ -121,7 +122,7 @@ const verifyOTPModifyPassword = async ({ userID, otp }) => {
 
         if (expiresAt < currentTime) {
           //!Record has expired
-          await OTPVerification.deleteMany({ userID });
+          await OTPVerification.deleteMany({ userID: userID });
           let message = "common:OTP_has_expired";
           //OTP has expired,Please signup again
           throw new Error(message);
@@ -131,7 +132,7 @@ const verifyOTPModifyPassword = async ({ userID, otp }) => {
           const matchString = await verifyHashedData(otp, hashedOTP);
           //todo Strings match
           if (matchString) {
-            await OTPVerification.deleteMany({ userID });
+            await OTPVerification.deleteMany({ userID: userID });
             //transform id to integer
           } else {
             throw Error("common:Invalid_verification_details_passed");
@@ -152,8 +153,9 @@ const resendOTP = async ({ userID, email }) => {
       throw Error("common:Empty_details_are_not_allowed");
     } else {
       // delete existing records and resend
-      await OTPVerification.deleteMany({ userID });
-      await sendOTPVerificationEmail({ userID, email });
+      await OTPVerification.deleteMany({ userID: userID });
+      const _id = userID;
+      await sendOTPVerificationEmail({ _id, email });
 
       return true;
     }

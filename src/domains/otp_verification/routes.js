@@ -10,9 +10,8 @@ const {
 router.post("/verify-modify-password", async (req, res) => {
   const { otp, id } = req.body;
   //transform id to string
-  const userID = id.toString();
   try {
-    await verifyOTPModifyPassword({ userID, otp });
+    await verifyOTPModifyPassword({ id, otp });
     res.json({
       status: "Success",
       message: "You can set your new password now",
@@ -29,9 +28,8 @@ router.post("/verify-modify-password", async (req, res) => {
 router.post("/verify", async (req, res) => {
   const { otp, id } = req.body;
   //transform id to string
-  const userID = id.toString();
   try {
-    await verifyOTPEmail({ userID, otp });
+    await verifyOTPEmail({ id, otp });
     res.json({
       status: "Success",
       message: "You account has been verified",
@@ -50,8 +48,7 @@ router.post("/resendOTP", async (req, res) => {
   try {
     let { id, email } = req.body;
 
-    const userID = id.toString();
-    const resendEmail = await resendOTP({ userID, email });
+    const resendEmail = await resendOTP({ id, email });
     if (resendEmail === true) {
       res.json({
         status: "Success",
