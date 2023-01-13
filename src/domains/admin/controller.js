@@ -75,7 +75,7 @@ const authenticate = async (email, password) => {
           },
           process.env.SECRET,
           {
-            expiresIn: "48h",
+            expiresIn: "7d",
           }
         );
         fetchedClient.token = token;
@@ -115,7 +115,7 @@ const authenticate = async (email, password) => {
           },
           process.env.SECRET,
           {
-            expiresIn: "48h",
+            expiresIn: "7d",
           }
         );
         fetchedHotel.token = token;
@@ -149,7 +149,7 @@ const authenticate = async (email, password) => {
           },
           process.env.SECRET,
           {
-            expiresIn: "48h",
+            expiresIn: "7d",
           }
         );
         fetchedAdmin.token = token;
