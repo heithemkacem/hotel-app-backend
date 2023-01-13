@@ -81,7 +81,8 @@ const authenticate = async (email, password) => {
         fetchedClient.token = token;
         return {
           status: "Success",
-          message: "Admin Found",
+          message: "Client Found",
+          whoami: "Client",
           token: "Bearer " + fetchedClient.token,
           user: fetchedClient,
         };
@@ -120,7 +121,8 @@ const authenticate = async (email, password) => {
         fetchedHotel.token = token;
         return {
           status: "Success",
-          message: "Admin Found",
+          message: "Hotel Found",
+          whoami: "Hotel",
           token: "Bearer " + fetchedHotel.token,
           user: fetchedHotel,
         };
@@ -154,6 +156,7 @@ const authenticate = async (email, password) => {
         return {
           status: "Success",
           message: "Admin Found",
+          whoami: "Admin",
           token: "Bearer " + fetchedAdmin.token,
           user: fetchedAdmin,
         };

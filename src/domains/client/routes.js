@@ -35,6 +35,8 @@ router.post("/signup", async (req, res) => {
         status: "Success",
         message: "Client created successfully",
         client: createdClient,
+        id: createdClient.id,
+        email: createdClient.email,
       });
     }
   } catch (error) {

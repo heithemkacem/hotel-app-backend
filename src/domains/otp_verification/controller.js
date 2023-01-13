@@ -139,7 +139,7 @@ const verifyOTPModifyPassword = async (userID, otp) => {
           }
         }
       } else {
-        throw Error("common:Account_reccord_doesnt_exist_signup_or_login");
+        throw Error("common:No_record_exist_push_resend_email");
       }
     }
   } catch (error) {
