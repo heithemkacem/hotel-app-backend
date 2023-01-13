@@ -1,18 +1,20 @@
 //mongoDB
-require('./config/db')
-const errorHandler = require('./config/error-handler')
-const app=require('express')()
-const cors = require('cors')
-const bodyParser=require('express').json
-const routes= require('./routes')
+require("./config/db");
+const errorHandler = require("./config/error-handler");
+const app = require("express")();
+const cors = require("cors");
+const bodyParser = require("express").json;
+const routes = require("./routes");
 
-app.use(errorHandler)   
+app.use(errorHandler);
 //cors
-app.use(cors())
+app.use(cors());
 //for accepting posts from data
-app.use(bodyParser())
+app.use(bodyParser());
 //registering routes
-app.use(routes)
+app.use(routes);
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
 
-module.exports = app
-
+module.exports = app;
