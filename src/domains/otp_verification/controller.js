@@ -78,9 +78,7 @@ const verifyOTPEmail = async (userID, otp) => {
             const fetchedHotel = await Hotel.findOne({ _id: userID });
             const fetchedClient = await Client.findOne({ _id: userID });
             const fetchedAdmin = await Admin.findOne({ _id: userID });
-            console.log(fetchedHotel);
-            console.log(fetchedClient);
-            console.log(fetchedAdmin);
+
             if (fetchedClient != null) {
               await Client.updateOne({ _id: userID }, { verified: true });
             } else if (fetchedHotel != null) {
