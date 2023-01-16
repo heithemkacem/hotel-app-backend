@@ -17,6 +17,7 @@ router.post("/findHotel", async (req, res) => {
     const { id } = req.body;
     const foundedHotel = await GetHotelById(id);
     const {
+      _id,
       hotelName,
       hotelAddress,
       hotelCity,
@@ -32,6 +33,7 @@ router.post("/findHotel", async (req, res) => {
       status: "Success",
       message: "Hotel Found",
       hotel: {
+        _id,
         hotelName,
         hotelAddress,
         hotelCity,
