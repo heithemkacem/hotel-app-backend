@@ -121,6 +121,7 @@ router.get("/hotels", async (req, res) => {
   try {
     const allHotels = await getAllHotels();
     const {
+      _id,
       hotelName,
       hotelAddress,
       hotelCity,
