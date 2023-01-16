@@ -212,7 +212,7 @@ const createHotel = async (data) => {
         hotelPhone,
         hotelEmail,
         password: hashedPassword,
-        verified: false,
+        verified: true,
         role: ROLES.HOTEL,
       });
       //Save the organization
