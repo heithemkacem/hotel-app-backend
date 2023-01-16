@@ -136,19 +136,21 @@ router.get("/hotels", async (req, res) => {
     res.json({
       status: "Success",
       message: "Hotels Found",
-      hotels: {
-        _id,
-        hotelName,
-        hotelAddress,
-        hotelCity,
-        hotelDescription,
-        hotelEmail,
-        hotelPhone,
-        hotelPrice,
-        hotelImage,
-        hotelStars,
-        hotelRooms,
-      },
+      hotels: [
+        {
+          _id,
+          hotelName,
+          hotelAddress,
+          hotelCity,
+          hotelDescription,
+          hotelEmail,
+          hotelPhone,
+          hotelPrice,
+          hotelImage,
+          hotelStars,
+          hotelRooms,
+        },
+      ],
     });
   } catch (error) {
     res.json({
