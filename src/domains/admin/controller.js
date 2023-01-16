@@ -255,9 +255,10 @@ const updateHotel = async (id, data) => {
 const getAllHotels = async () => {
   try {
     const allHotels = await Hotel.find();
-    if (!allHotels) {
+    if (!allHotels.length) {
       return null;
     }
+
     return allHotels;
   } catch (error) {
     throw error;

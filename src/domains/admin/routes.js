@@ -120,24 +120,24 @@ router.post("/create-hotel", async (req, res) => {
 router.get("/hotels", async (req, res) => {
   try {
     const allHotels = await getAllHotels();
-    const {
-      _id,
-      hotelName,
-      hotelAddress,
-      hotelCity,
-      hotelDescription,
-      hotelEmail,
-      hotelPhone,
-      hotelPrice,
-      hotelImage,
-      hotelStars,
-      hotelRooms,
-    } = allHotels;
-    res.json({
-      status: "Success",
-      message: "Hotels Found",
-      hotels: [
-        {
+    if (allHotels !== null) {
+      const {
+        _id,
+        hotelName,
+        hotelAddress,
+        hotelCity,
+        hotelDescription,
+        hotelEmail,
+        hotelPhone,
+        hotelPrice,
+        hotelImage,
+        hotelStars,
+        hotelRooms,
+      } = allHotels;
+      res.json({
+        status: "Success",
+        message: "Hotels Found",
+        hotels: [
           _id,
           hotelName,
           hotelAddress,
@@ -149,9 +149,15 @@ router.get("/hotels", async (req, res) => {
           hotelImage,
           hotelStars,
           hotelRooms,
-        },
-      ],
-    });
+        ],
+      });
+    } else {
+      res.json({
+        status: "Success",
+        message: "No Hotels Found",
+        hotels: [],
+      });
+    }
   } catch (error) {
     res.json({
       status: "Failed",
