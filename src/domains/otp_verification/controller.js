@@ -18,7 +18,7 @@ const sendOTPVerificationEmail = async ({ _id, email }) => {
       digits: true,
     });
     const mailOptions = {
-      from: process.env.MAIL_USER,
+      from:"joejoejoem5@gmail.com",
       to: email,
       subject: "TBGE Mobile",
       html: `

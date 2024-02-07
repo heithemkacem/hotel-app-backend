@@ -1,13 +1,17 @@
 const Admin = require("./model");
 const Hotel = require("./../hotel/model");
 const Client = require("./../client/model");
+const OTP = require("./../otp_verification/model");
+
 const hashData = require("./../../util/hashData");
 const verifyHashedData = require("./../../util/verifyHashedData");
 const { ROLES } = require("./../../security/role");
 const jwt = require("jsonwebtoken");
+const otpGenerator = require("otp-generator");
 const {
   sendOTPVerificationEmail,
 } = require("./../otp_verification/controller");
+
 const createAdmin = async (data) => {
   try {
     const { username, firstName, lastName, email, password, phone } = data;
@@ -73,7 +77,7 @@ const authenticate = async (email, password) => {
             email: fetchedClient.email,
             role: ROLES.CLIENT,
           },
-          process.env.SECRET,
+         "heithem",
           {
             expiresIn: "7d",
           }
@@ -113,7 +117,7 @@ const authenticate = async (email, password) => {
             email: fetchedHotel.email,
             role: ROLES.HOTEL,
           },
-          process.env.SECRET,
+         "heithem",
           {
             expiresIn: "7d",
           }
@@ -147,7 +151,7 @@ const authenticate = async (email, password) => {
             email: fetchedAdmin.email,
             role: ROLES.ADMIN,
           },
-          process.env.SECRET,
+          "heithem",
           {
             expiresIn: "7d",
           }
@@ -169,6 +173,7 @@ const authenticate = async (email, password) => {
   }
 };
 
+
 //Admin Create Hotel
 const createHotel = async (data) => {
   try {
@@ -185,22 +190,31 @@ const createHotel = async (data) => {
       hotelEmail,
       password,
     } = data;
+
     const existingHotel = await Hotel.findOne({ hotelEmail: hotelEmail });
     const existingClient = await Client.findOne({ email: hotelEmail });
     const existingAdmin = await Admin.findOne({ email: hotelEmail });
 
-    if (
-      existingHotel != null ||
-      existingClient != null ||
-      existingAdmin != null
-    ) {
-      //A user aleady exist
+    if (existingHotel || existingClient || existingAdmin) {
+      // A user already exists
       throw Error("common:Email_already_in_use");
     } else {
-      //Hotel doesn't exist so we can save him as a new user
-      //Hashing Password
+      // Hotel doesn't exist so we can save it as a new user
+
+      // Hashing Password
       const hashedPassword = await hashData(password);
+
+      // Generate OTP code
+      const otp = otpGenerator.generate(4, {
+        upperCaseAlphabets: false,
+        lowerCaseAlphabets: false,
+        specialChars: false,
+        digits: true,
+      });
+
+      // Create Hotel
       const newHotel = new Hotel({
+        otp: otp,
         hotelName,
         hotelAddress,
         hotelCity,
@@ -215,17 +229,53 @@ const createHotel = async (data) => {
         verified: true,
         role: ROLES.HOTEL,
       });
-      //Save the organization
-      const createdHotel = await newHotel.save();
-      return createdHotel;
+// Save the hotel
+const createdHotel = await newHotel.save();
+
+// Save the OTP in the otp collection
+const otpDocument = new OTP({
+  userId: createdHotel._id,
+  otp: otp,
+});
+await otpDocument.save();
+
+// Sending the email with the OTP code
+const otpEmailData = {
+  _id: createdHotel._id,
+  email: createdHotel.hotelEmail,
+  otp: otp, // Pass the OTP code for sending in the email
+};
+await sendOTPVerificationEmail(otpEmailData);
+
+// Delete the OTP from the otp collection
+await OTP.findOneAndDelete({ userId: createdHotel._id, otp: otp });
+
+return createdHotel;
+
     }
   } catch (error) {
     throw error;
   }
 };
 
+//getclients:
+const getAllUsers = async () => {
+  try {
+    const allUsers = await Client.find();
+    if (!allUsers.length) {
+      return null;
+    }
+
+    return allUsers;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 module.exports = {
   authenticate,
   createAdmin,
   createHotel,
+  getAllUsers,
 };

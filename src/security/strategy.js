@@ -4,7 +4,7 @@ var opts = {};
 
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 
-opts.secretOrKey = process.env.SECRET;
+opts.secretOrKey = "heithem";
 
 const { getAdmin } = require("../domains/admin/controller");
 

@@ -10,6 +10,7 @@ const {
   createAdmin,
   authenticate,
   createHotel,
+  getAllUsers,
   getAllHotels,
   deleteHotel,
   updateHotel,
@@ -106,6 +107,31 @@ router.post("/create-hotel", async (req, res) => {
         status: "Success",
         message: "Hotel created successfully",
         admin: createdHotel,
+      });
+    }
+  } catch (error) {
+    res.json({
+      status: "Failed",
+      message: error.message,
+    });
+  }
+});
+// getall users
+router.get("/users", async (req, res) => {
+  try {
+    const allUsers = await getAllUsers();
+console.log("hellll")
+    if (allUsers !== null) {
+      res.json({
+        status: "Success",
+        message: "users Found",
+        users: allUsers,
+      });
+    } else {
+      res.json({
+        status: "Success",
+        message: "No users Found",
+        users: [],
       });
     }
   } catch (error) {

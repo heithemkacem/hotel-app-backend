@@ -6,12 +6,56 @@ const passport = require("passport");
 const { strategy } = require("./../../security/strategy");
 const {
   GetHotelById,
+  GetUsersByOTP,
   getAllHotels,
   updateHotel,
   deleteHotel,
+  getHotelByOTP,
 } = require("./controller");
 router.use(passport.initialize());
 passport.use(strategy);
+router.post("/findHotelOtp", async (req, res) => {
+  try {
+    const { otp} = req.body;
+    const foundedHotel = await getHotelByOTP(otp);
+    const {
+      _id,
+      hotelName,
+      hotelAddress,
+      hotelCity,
+      hotelDescription,
+      hotelEmail,
+      hotelPhone,
+      hotelPrice,
+      hotelImage,
+      hotelStars,
+      hotelRooms,
+    } = foundedHotel;
+    res.json({
+      status: "Success",
+      message: "Hotel Found",
+      hotel: {
+        _id,
+        hotelName,
+        hotelAddress,
+        hotelCity,
+        hotelDescription,
+        hotelEmail,
+        hotelPhone,
+        hotelPrice,
+        hotelImage,
+        hotelStars,
+        hotelRooms,
+      },
+    });
+  } catch (error) {
+    res.json({
+      status: "Failed",
+      message: error.message,
+    });
+  }
+});
+
 router.post("/findHotel", async (req, res) => {
   try {
     const { id } = req.body;
@@ -78,6 +122,23 @@ router.get("/hotels", async (req, res) => {
     });
   }
 });
+//usersbyottp
+router.post("/userHotel", async (req, res) => {
+  const { otp } = req.body;
+
+  try {
+    const user = await GetUsersByOTP(otp);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found. Check the OTP.' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //Admin Delete Hotel
 router.delete("/delete-hotel/:id", async (req, res) => {
@@ -115,4 +176,48 @@ router.put("/update-hotel/:id", async (req, res) => {
     });
   }
 });
+// get hotel by otp 
+// router.post("/findHotelOtp", async (req, res) => {
+//   try {
+//     const { otp } = req.body;
+//     console.log("otp",otp);
+//     const foundedHotel = await getHotelByOTP(otp);
+//     const {
+//       _id,
+//       hotelName,
+//       hotelAddress,
+//       hotelCity,
+//       hotelDescription,
+//       hotelEmail,
+//       hotelPhone,
+//       hotelPrice,
+//       hotelImage,
+//       hotelStars,
+//       hotelRooms,
+//     } = foundedHotel;
+//     res.json({
+//       status: "Success",
+//       message: "Hotel Found",
+//       hotel: {
+//         _id,
+//         otp,
+//         hotelName,
+//         hotelAddress,
+//         hotelCity,
+//         hotelDescription,
+//         hotelEmail,
+//         hotelPhone,
+//         hotelPrice,
+//         hotelImage,
+//         hotelStars,
+//         hotelRooms,
+//       },
+//     });
+//   } catch (error) {
+//     res.json({
+//       status: "Failed",
+//       message: error.message,
+//     });
+//   }
+// });
 module.exports = router;
