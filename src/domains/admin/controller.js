@@ -76,8 +76,10 @@ const authenticate = async (email, password) => {
             id: fetchedClient._id,
             email: fetchedClient.email,
             role: ROLES.CLIENT,
+            firstName: fetchedClient.firstName,
+            lastName: fetchedClient.lastName,
           },
-         "heithem",
+          "heithem",
           {
             expiresIn: "7d",
           }
@@ -116,8 +118,9 @@ const authenticate = async (email, password) => {
             id: fetchedHotel._id,
             email: fetchedHotel.email,
             role: ROLES.HOTEL,
+            hotelName: fetchedHotel.hotelName,
           },
-         "heithem",
+          "heithem",
           {
             expiresIn: "7d",
           }
@@ -172,7 +175,6 @@ const authenticate = async (email, password) => {
     throw error;
   }
 };
-
 
 //Admin Create Hotel
 const createHotel = async (data) => {
@@ -229,29 +231,28 @@ const createHotel = async (data) => {
         verified: true,
         role: ROLES.HOTEL,
       });
-// Save the hotel
-const createdHotel = await newHotel.save();
+      // Save the hotel
+      const createdHotel = await newHotel.save();
 
-// Save the OTP in the otp collection
-const otpDocument = new OTP({
-  userId: createdHotel._id,
-  otp: otp,
-});
-await otpDocument.save();
+      // Save the OTP in the otp collection
+      const otpDocument = new OTP({
+        userId: createdHotel._id,
+        otp: otp,
+      });
+      await otpDocument.save();
 
-// Sending the email with the OTP code
-const otpEmailData = {
-  _id: createdHotel._id,
-  email: createdHotel.hotelEmail,
-  otp: otp, // Pass the OTP code for sending in the email
-};
-await sendOTPVerificationEmail(otpEmailData);
+      // Sending the email with the OTP code
+      const otpEmailData = {
+        _id: createdHotel._id,
+        email: createdHotel.hotelEmail,
+        otp: otp, // Pass the OTP code for sending in the email
+      };
+      await sendOTPVerificationEmail(otpEmailData);
 
-// Delete the OTP from the otp collection
-await OTP.findOneAndDelete({ userId: createdHotel._id, otp: otp });
+      // Delete the OTP from the otp collection
+      await OTP.findOneAndDelete({ userId: createdHotel._id, otp: otp });
 
-return createdHotel;
-
+      return createdHotel;
     }
   } catch (error) {
     throw error;
@@ -271,7 +272,6 @@ const getAllUsers = async () => {
     throw error;
   }
 };
-
 
 module.exports = {
   authenticate,
