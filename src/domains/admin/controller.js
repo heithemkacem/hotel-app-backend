@@ -119,6 +119,7 @@ const authenticate = async (email, password) => {
             email: fetchedHotel.email,
             role: ROLES.HOTEL,
             hotelName: fetchedHotel.hotelName,
+            otp: fetchedHotel.otp,
           },
           "heithem",
           {

@@ -6,7 +6,10 @@ const cors = require("cors");
 const bodyParser = require("body-parser"); // Correct import
 const routes = require("./routes");
 const app = express();
-const http = require("http").Server(app);
+const http = require("http");
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const socketIO = new Server(server);
 app.use(express.json());
 app.use(errorHandler);
 //cors
@@ -15,11 +18,7 @@ app.use(cors());
 app.use(bodyParser.json()); // Correct usage
 // Registering routes
 app.use(routes);
-const socketIO = require("socket.io")(http, {
-  cors: {
-    origin: "http://localhost:3000",
-  },
-});
+
 const generateID = () => Math.random().toString(36).substring(2, 10);
 let chatRooms = [];
 socketIO.on("connection", (socket) => {

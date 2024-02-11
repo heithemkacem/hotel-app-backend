@@ -59,12 +59,11 @@ const getHotelByOTP = async (otp) => {
   try {
     const hotel = await OTPVerification.findOne({ otp: otp });
 
-   // const hotel = await Hotel.findById(otp);
+    // const hotel = await Hotel.findById(otp);
     if (!hotel) {
       throw new Error("Hotel not found, Check the otp");
     }
     return hotel;
-    
   } catch (error) {
     throw error;
   }
@@ -72,17 +71,22 @@ const getHotelByOTP = async (otp) => {
 //getusersbyotp
 const GetUsersByOTP = async (otp) => {
   console.log("hee");
-  
+
   try {
     const user = await Reservation.findOne({ otp: otp });
     if (!user) {
       throw new Error("user not found, Check the otp");
     }
-    console.log('userhotel',user);
     return user;
-   
   } catch (error) {
     throw error;
   }
 };
-module.exports = {  GetUsersByOTP,GetHotelById, getAllHotels, updateHotel, deleteHotel,getHotelByOTP };
+module.exports = {
+  GetUsersByOTP,
+  GetHotelById,
+  getAllHotels,
+  updateHotel,
+  deleteHotel,
+  getHotelByOTP,
+};
