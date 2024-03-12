@@ -3,6 +3,7 @@ const Reservation = require("./../ReservationRoutes/model");
 const verifyHashedData = require("./../../util/verifyHashedData");
 const { ROLES } = require("./../../security/role");
 const OTPVerification = require("./model");
+const Client = require("../ClientRoutes/model");
 //get hotel by id
 const GetHotelById = async (id) => {
   const hotel = await Hotel.findById(id);
@@ -50,11 +51,11 @@ const getHotelByOTP = async (otp) => {
 };
 //getusersbyotp
 const GetUsersByOTP = async (otp) => {
-  const user = await Reservation.findOne({ otp: otp });
-  if (!user) {
-    throw new Error("user not found, Check the otp");
+  const users = await Client.find({ otp: otp });
+  if (!users) {
+    throw new Error("No user found. Check the OTP.");
   }
-  return user;
+  return users;
 };
 module.exports = {
   GetUsersByOTP,

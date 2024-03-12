@@ -10,41 +10,23 @@ const {
   deleteHotel,
   getHotelByOTP,
 } = require("./controller");
+const PrivateRoute = require("../../security/strategy");
+const checkRole = require("../../security/role");
+const e = require("express");
 
-router.post("/findHotelOtp", async (req, res) => {
+router.post("/findHotelOtp", PrivateRoute, async (req, res) => {
   try {
     const { otp } = req.body;
     const foundedHotel = await getHotelByOTP(otp);
-    const {
-      _id,
-      hotelName,
-      hotelAddress,
-      hotelCity,
-      hotelDescription,
-      hotelEmail,
-      hotelPhone,
-      hotelPrice,
-      hotelImage,
-      hotelStars,
-      hotelRooms,
-    } = foundedHotel;
-    res.json({
-      status: "Success",
-      message: "Hotel Found",
-      hotel: {
-        _id,
-        hotelName,
-        hotelAddress,
-        hotelCity,
-        hotelDescription,
-        hotelEmail,
-        hotelPhone,
-        hotelPrice,
-        hotelImage,
-        hotelStars,
-        hotelRooms,
-      },
-    });
+    if (foundedHotel) {
+      res.json({
+        status: "Success",
+        message: "Hotel Found",
+        hotel: foundedHotel,
+      });
+    } else {
+      throw Error("Hotel Not Found");
+    }
   } catch (error) {
     res.json({
       status: "Failed",
@@ -53,39 +35,14 @@ router.post("/findHotelOtp", async (req, res) => {
   }
 });
 
-router.post("/findHotel", async (req, res) => {
+router.post("/findHotel", PrivateRoute, async (req, res) => {
   try {
     const { id } = req.body;
     const foundedHotel = await GetHotelById(id);
-    const {
-      _id,
-      hotelName,
-      hotelAddress,
-      hotelCity,
-      hotelDescription,
-      hotelEmail,
-      hotelPhone,
-      hotelPrice,
-      hotelImage,
-      hotelStars,
-      hotelRooms,
-    } = foundedHotel;
     res.json({
       status: "Success",
       message: "Hotel Found",
-      hotel: {
-        _id,
-        hotelName,
-        hotelAddress,
-        hotelCity,
-        hotelDescription,
-        hotelEmail,
-        hotelPhone,
-        hotelPrice,
-        hotelImage,
-        hotelStars,
-        hotelRooms,
-      },
+      hotel: foundedHotel,
     });
   } catch (error) {
     res.json({
@@ -95,10 +52,9 @@ router.post("/findHotel", async (req, res) => {
   }
 });
 //Admin Get All Hotels
-router.get("/hotels", async (req, res) => {
+router.get("/hotels", checkRole("admin", ["ADMIN"]), async (req, res) => {
   try {
     const allHotels = await getAllHotels();
-
     if (allHotels !== null) {
       res.json({
         status: "Success",
@@ -120,11 +76,10 @@ router.get("/hotels", async (req, res) => {
   }
 });
 //usersbyottp
-router.post("/userHotel", async (req, res) => {
+router.post("/userHotel", checkRole("hotel", ["HOTEL"]), async (req, res) => {
   const { otp } = req.body;
   try {
     const user = await GetUsersByOTP(otp);
-
     if (!user) {
       return res.status(404).json({ error: "User not found. Check the OTP." });
     }
@@ -137,23 +92,27 @@ router.post("/userHotel", async (req, res) => {
   }
 });
 //Admin Delete Hotel
-router.delete("/delete-hotel/:id", async (req, res) => {
-  try {
-    const deletedHotel = await deleteHotel(req.params.id);
-    res.json({
-      status: "Success",
-      message: "Hotel Deleted",
-      hotel: deletedHotel,
-    });
-  } catch (error) {
-    res.json({
-      status: "Failed",
-      message: error.message,
-    });
+router.delete(
+  "/delete-hotel/:id",
+  checkRole("admin", ["ADMIN"]),
+  async (req, res) => {
+    try {
+      const deletedHotel = await deleteHotel(req.params.id);
+      res.json({
+        status: "Success",
+        message: "Hotel Deleted",
+        hotel: deletedHotel,
+      });
+    } catch (error) {
+      res.json({
+        status: "Failed",
+        message: error.message,
+      });
+    }
   }
-});
+);
 //Admin Update Hotel
-router.put("/update-hotel/:id", async (req, res) => {
+router.put("/update-hotel/:id", PrivateRoute, async (req, res) => {
   try {
     const { error } = hotelRegisterValidation(req.body);
     if (error) {
@@ -172,48 +131,5 @@ router.put("/update-hotel/:id", async (req, res) => {
     });
   }
 });
-// get hotel by otp
-// router.post("/findHotelOtp", async (req, res) => {
-//   try {
-//     const { otp } = req.body;
-//     console.log("otp",otp);
-//     const foundedHotel = await getHotelByOTP(otp);
-//     const {
-//       _id,
-//       hotelName,
-//       hotelAddress,
-//       hotelCity,
-//       hotelDescription,
-//       hotelEmail,
-//       hotelPhone,
-//       hotelPrice,
-//       hotelImage,
-//       hotelStars,
-//       hotelRooms,
-//     } = foundedHotel;
-//     res.json({
-//       status: "Success",
-//       message: "Hotel Found",
-//       hotel: {
-//         _id,
-//         otp,
-//         hotelName,
-//         hotelAddress,
-//         hotelCity,
-//         hotelDescription,
-//         hotelEmail,
-//         hotelPhone,
-//         hotelPrice,
-//         hotelImage,
-//         hotelStars,
-//         hotelRooms,
-//       },
-//     });
-//   } catch (error) {
-//     res.json({
-//       status: "Failed",
-//       message: error.message,
-//     });
-//   }
-// });
+
 module.exports = router;

@@ -18,39 +18,34 @@ const PrivateRoute = require("./../../security/strategy");
 const checkRole = require("./../../security/role");
 
 // Admin Inscription
-router.post(
-  "/signup",
-  PrivateRoute,
-  checkRole("admin", ["ADMIN"]),
-  async (req, res) => {
-    const { username, firstName, lastName, email, password, phone } = req.body;
-    try {
-      const { error } = adminRegisterValidation(req.body);
-      if (error) {
-        res.send({ status: "Failed", message: error["details"][0]["message"] });
-      } else {
-        const createdAdmin = await createAdmin({
-          username,
-          firstName,
-          lastName,
-          email,
-          password,
-          phone,
-        });
-        res.json({
-          status: "Success",
-          message: "Admin created successfully",
-          admin: createdAdmin,
-        });
-      }
-    } catch (error) {
+router.post("/signup", checkRole("admin", ["ADMIN"]), async (req, res) => {
+  const { username, firstName, lastName, email, password, phone } = req.body;
+  try {
+    const { error } = adminRegisterValidation(req.body);
+    if (error) {
+      res.send({ status: "Failed", message: error["details"][0]["message"] });
+    } else {
+      const createdAdmin = await createAdmin({
+        username,
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+      });
       res.json({
-        status: "Failed",
-        message: error.message,
+        status: "Success",
+        message: "Admin created successfully",
+        admin: createdAdmin,
       });
     }
+  } catch (error) {
+    res.json({
+      status: "Failed",
+      message: error.message,
+    });
   }
-);
+});
 
 //Auth
 router.post("/auth", async (req, res) => {
@@ -61,6 +56,7 @@ router.post("/auth", async (req, res) => {
       res.send({ status: "Failed", message: error["details"][0]["message"] });
     } else {
       const authenticated = await authenticate(email, password);
+      console.log(authenticated);
       res.json(authenticated);
     }
   } catch (error) {
@@ -73,7 +69,6 @@ router.post("/auth", async (req, res) => {
 
 router.post(
   "/create-hotel",
-  PrivateRoute,
   checkRole("admin", ["ADMIN"]),
   async (req, res) => {
     const {
@@ -122,33 +117,28 @@ router.post(
   }
 );
 // getall users
-router.get(
-  "/users",
-  PrivateRoute,
-  checkRole("admin", ["ADMIN"]),
-  async (req, res) => {
-    try {
-      const allUsers = await getAllUsers();
-      if (allUsers !== null) {
-        res.json({
-          status: "Success",
-          message: "Users Found",
-          users: allUsers,
-        });
-      } else {
-        res.json({
-          status: "Success",
-          message: "No Users Found",
-          users: [],
-        });
-      }
-    } catch (error) {
+router.get("/users", checkRole("admin", ["ADMIN"]), async (req, res) => {
+  try {
+    const allUsers = await getAllUsers();
+    if (allUsers !== null) {
       res.json({
-        status: "Failed",
-        message: error.message,
+        status: "Success",
+        message: "Users Found",
+        users: allUsers,
+      });
+    } else {
+      res.json({
+        status: "Success",
+        message: "No Users Found",
+        users: [],
       });
     }
+  } catch (error) {
+    res.json({
+      status: "Failed",
+      message: error.message,
+    });
   }
-);
+});
 
 module.exports = router;

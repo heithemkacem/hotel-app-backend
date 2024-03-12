@@ -8,7 +8,7 @@ const PrivateRoute = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   if (!token) return res.status(403).json({ error: "Token missing" });
 
-  jwt.verify(token, process.env.APP_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) {
       console.error("JWT verification failed:", err.message);
       return res.status(403).json({ error: "Token verification failed" });

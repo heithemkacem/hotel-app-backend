@@ -8,6 +8,7 @@ const {
   ResetPassword,
   ModifyPasswordFromDashboard,
 } = require("./controller");
+const PrivateRoute = require("../../security/strategy");
 // Client Inscription
 router.post("/signup", async (req, res) => {
   const { username, firstName, lastName, email, phone, password } = req.body;
@@ -75,7 +76,7 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 // User change password from dashboard
-router.post("/reset_password", async (req, res) => {
+router.post("/reset_password", PrivateRoute, async (req, res) => {
   try {
     const { id, oldPassword, newPassword, confirmNewPassword } = req.body;
 

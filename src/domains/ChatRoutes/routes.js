@@ -1,7 +1,8 @@
 const express = require("express");
+const PrivateRoute = require("../../security/strategy");
 const router = express.Router();
 router.use(express.json());
-router.post("/chat", async (req, res) => {
+router.post("/chat", PrivateRoute, async (req, res) => {
   try {
     console.log("Chat:", req.body);
   } catch (error) {
