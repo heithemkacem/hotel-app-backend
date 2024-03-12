@@ -1,21 +1,23 @@
-var JwtStrategy = require("passport-jwt").Strategy,
-  ExtractJwt = require("passport-jwt").ExtractJwt;
-var opts = {};
+const jwt = require("jsonwebtoken");
 
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+const PrivateRoute = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader)
+    return res.status(403).json({ error: "Authorization header missing" });
 
-opts.secretOrKey = "heithem";
+  const token = authHeader.split(" ")[1];
+  if (!token) return res.status(403).json({ error: "Token missing" });
 
-const { getAdmin } = require("../domains/admin/controller");
+  jwt.verify(token, process.env.APP_SECRET, (err, decoded) => {
+    if (err) {
+      console.error("JWT verification failed:", err.message);
+      return res.status(403).json({ error: "Token verification failed" });
+    }
 
-let strategy = new JwtStrategy(opts, function (jwt_payload, next) {
-  let client = getAdmin({ _id: jwt_payload.id });
-  if (client) {
-    return next(null, client);
-  } else {
-    return next(null, false);
-    // or you could create a new account
-  }
-});
+    // If verification succeeds, attach the decoded token to the request for further processing
+    req.user = decoded;
+    next();
+  });
+};
 
-module.exports = { strategy };
+module.exports = PrivateRoute;

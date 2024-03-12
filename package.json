@@ -20,11 +20,7 @@
     "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
     "otp-generator": "^4.0.0",
-    "passport": "^0.6.0",
-    "passport-jwt": "^4.0.1",
-    "react-native-gifted-chat": "^2.4.0",
     "socket.io": "^4.7.4",
-    "twilio": "^3.77.0",
     "uuid": "^8.3.2"
   },
   "author": "Heithem Kacem",
