@@ -13,12 +13,21 @@ const {
 const PrivateRoute = require("../../security/strategy");
 const checkRole = require("../../security/role");
 const e = require("express");
+const Client = require("../ClientRoutes/model");
 
 router.post("/findHotelOtp", PrivateRoute, async (req, res) => {
   try {
     const { otp } = req.body;
     const foundedHotel = await getHotelByOTP(otp);
+
     if (foundedHotel) {
+      //Add the user to the hotel list
+      foundedHotel.users.push(req.user.id);
+      await foundedHotel.save();
+      const client = await Client.findById(req.user.id);
+      console.log(client);
+      client.hotels.push(foundedHotel._id);
+      await client.save();
       res.json({
         status: "Success",
         message: "Hotel Found",

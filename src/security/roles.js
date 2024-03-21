@@ -1,2 +1,2 @@
-const ROLES = ["HOTEL", "ADMIN", "USER"];
+const ROLES = { HOTEL: "HOTEL", ADMIN: "ADMIN", CLIENT: "CLIENT" };
 exports.ROLES = ROLES;

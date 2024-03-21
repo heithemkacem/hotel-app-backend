@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const HotelSchema = new Schema({
-  otp: { 
-    type: String },
+  otp: {
+    type: String,
+  },
   hotelName: {
     type: String,
     require: true,
@@ -14,6 +15,10 @@ const HotelSchema = new Schema({
     require: true,
     min: 4,
     max: 26,
+  },
+  image: {
+    type: String,
+    require: true,
   },
   hotelCity: {
     type: String,
@@ -37,10 +42,7 @@ const HotelSchema = new Schema({
     type: String,
     require: true,
   },
-  hotelImage: {
-    type: String,
-    require: true,
-  },
+
   hotelPhone: {
     type: Number,
     require: true,
@@ -71,6 +73,12 @@ const HotelSchema = new Schema({
   token: {
     type: String,
   },
+  users: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "client",
+    },
+  ],
 });
 const Hotel = mongoose.model("hotel", HotelSchema);
 module.exports = Hotel;

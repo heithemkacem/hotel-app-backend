@@ -11,7 +11,7 @@ const {
   sendOTPVerificationEmail,
   sendOTPHotelEmail,
 } = require("./../OTPVerificationRoutes/controller");
-
+const { sendNotification, getReceipt } = require("../../util/sendNotification");
 const createAdmin = async (data) => {
   const { username, firstName, lastName, email, password, phone } = data;
   const existingClient = await Client.findOne({ email: email });
@@ -43,12 +43,21 @@ const createAdmin = async (data) => {
     return createdAdmin;
   }
 };
-const authenticate = async (email, password) => {
+const authenticate = async (email, password, expoPushToken) => {
   const fetchedHotel = await Hotel.findOne({ hotelEmail: email });
   const fetchedClient = await Client.findOne({ email: email });
   const fetchedAdmin = await Admin.findOne({ email: email });
 
   if (fetchedClient != null) {
+    if (expoPushToken === undefined) {
+      return authenticateClient(fetchedClient, password);
+    }
+    sendNotification(
+      expoPushToken,
+      "Login Notification",
+      "You have been logged in"
+    );
+    getReceipt(expoPushToken);
     return authenticateClient(fetchedClient, password);
   }
   if (fetchedHotel != null) {
@@ -57,7 +66,6 @@ const authenticate = async (email, password) => {
   if (fetchedAdmin != null) {
     return authenticateAdmin(fetchedAdmin, password);
   }
-
   throw Error("common:Invalid_credentials");
 };
 
@@ -86,7 +94,7 @@ const authenticateClient = async (fetchedClient, password) => {
     {
       id: _id,
       email,
-      role: ROLES.CLIENT,
+      role: "CLIENT",
       firstName,
       lastName,
     },
@@ -101,7 +109,6 @@ const authenticateClient = async (fetchedClient, password) => {
   return {
     status: "Success",
     message: "Client Found",
-    whoami: "Client",
     token: "Bearer " + fetchedClient.token,
     user: fetchedClient,
   };
@@ -109,7 +116,6 @@ const authenticateClient = async (fetchedClient, password) => {
 
 const authenticateHotel = async (fetchedHotel, password) => {
   const { verified, _id, hotelEmail, hotelName, otp } = fetchedHotel;
-
   if (!verified) {
     await sendOTPVerificationEmail({ _id, email: hotelEmail });
     return {
@@ -118,7 +124,6 @@ const authenticateHotel = async (fetchedHotel, password) => {
       id: _id,
     };
   }
-
   const passwordMatch = await verifyHashedData(password, fetchedHotel.password);
 
   if (!passwordMatch) {
@@ -129,7 +134,7 @@ const authenticateHotel = async (fetchedHotel, password) => {
     {
       id: _id,
       email: hotelEmail,
-      role: ROLES.HOTEL,
+      role: "HOTEL",
       hotelName,
       otp,
     },
@@ -138,18 +143,14 @@ const authenticateHotel = async (fetchedHotel, password) => {
       expiresIn: "7d",
     }
   );
-
   fetchedHotel.token = token;
-
   return {
     status: "Success",
     message: "Hotel Found",
-    whoami: "Hotel",
     token: "Bearer " + fetchedHotel.token,
     user: fetchedHotel,
   };
 };
-
 const authenticateAdmin = async (fetchedAdmin, password) => {
   const { verified, _id, email } = fetchedAdmin;
 
@@ -172,7 +173,7 @@ const authenticateAdmin = async (fetchedAdmin, password) => {
     {
       id: _id,
       email,
-      role: ROLES.ADMIN,
+      role: "ADMIN",
     },
     process.env.SECRET,
     {
@@ -185,13 +186,12 @@ const authenticateAdmin = async (fetchedAdmin, password) => {
   return {
     status: "Success",
     message: "Admin Found",
-    whoami: "Admin",
     token: "Bearer " + fetchedAdmin.token,
     user: fetchedAdmin,
   };
 };
 //Admin Create Hotel
-const createHotel = async (data) => {
+const createHotel = async (hotelCredentails) => {
   const {
     hotelName,
     hotelAddress,
@@ -200,12 +200,13 @@ const createHotel = async (data) => {
     hotelRooms,
     hotelPrice,
     hotelDescription,
-    hotelImage,
     hotelPhone,
     hotelEmail,
     password,
-  } = data;
-
+    contentType,
+    name,
+    data,
+  } = hotelCredentails;
   const existingHotel = await Hotel.findOne({ hotelEmail: hotelEmail });
   const existingClient = await Client.findOne({ email: hotelEmail });
   const existingAdmin = await Admin.findOne({ email: hotelEmail });
@@ -233,12 +234,14 @@ const createHotel = async (data) => {
       hotelRooms,
       hotelPrice,
       hotelDescription,
-      hotelImage,
       hotelPhone,
       hotelEmail,
       password: hashedPassword,
       verified: true,
       role: ROLES.HOTEL,
+      name: name,
+      data: data,
+      contentType: contentType,
     });
     // Save the hotel
     const createdHotel = await newHotel.save();

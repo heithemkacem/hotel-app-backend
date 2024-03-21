@@ -6,10 +6,9 @@ const verifyHashedData = require("./../../util/verifyHashedData");
 const {
   sendOTPVerificationEmail,
 } = require("./../OTPVerificationRoutes/controller");
-const { ROLES } = require("./../../security/role");
+
 const createClient = async (data) => {
   const { username, firstName, lastName, email, phone, password } = data;
-
   const existingHotel = await Hotel.findOne({ hotelEmail: email });
   const existingClient = await Client.findOne({ email: email });
   const existingAdmin = await Admin.findOne({ email: email });
@@ -32,7 +31,7 @@ const createClient = async (data) => {
       phone,
       password: hashedPassword,
       verified: false,
-      role: ROLES.CLIENT,
+      role: "CLIENT",
     });
     //Save the organization
     const createdClient = await newClient.save();

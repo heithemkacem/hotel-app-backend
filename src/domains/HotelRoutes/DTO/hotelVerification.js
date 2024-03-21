@@ -34,9 +34,7 @@ const hotelRegisterValidation = (data) => {
     hotelDescription: joi.string().required().messages({
       "string.empty": `common:Enter_a_valid_hotel_description`,
     }),
-    hotelImage: joi.string().required().messages({
-      "string.empty": `common:Enter_a_valid_hotel_image`,
-    }),
+
     hotelEmail: joi.string().required().email().messages({
       "string.empty": "common:enter_valid_email",
       "string.email": "common:enter_valid_email",

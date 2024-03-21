@@ -41,11 +41,13 @@ const updateHotel = async (id, data) => {
 };
 //get hotel by otp
 const getHotelByOTP = async (otp) => {
-  const hotel = await OTPVerification.findOne({ otp: otp });
+  const hotel = await Hotel.findOne({ otp: otp });
 
   // const hotel = await Hotel.findById(otp);
   if (!hotel) {
     throw new Error("Hotel not found, Check the otp");
+  } else {
+    return hotel;
   }
   return hotel;
 };

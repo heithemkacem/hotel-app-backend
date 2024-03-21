@@ -46,6 +46,12 @@ const ClientSchema = new Schema({
     type: String,
     default: "CLIENT",
   },
+  hotels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "hotel",
+    },
+  ],
   token: {
     type: String,
   },
