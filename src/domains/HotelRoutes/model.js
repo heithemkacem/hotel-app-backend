@@ -79,6 +79,9 @@ const HotelSchema = new Schema({
       ref: "client",
     },
   ],
+  expoPushToken: {
+    type: String,
+  },
 });
 const Hotel = mongoose.model("hotel", HotelSchema);
 module.exports = Hotel;

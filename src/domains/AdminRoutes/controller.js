@@ -11,7 +11,6 @@ const {
   sendOTPVerificationEmail,
   sendOTPHotelEmail,
 } = require("./../OTPVerificationRoutes/controller");
-const { sendNotification, getReceipt } = require("../../util/sendNotification");
 const createAdmin = async (data) => {
   const { username, firstName, lastName, email, password, phone } = data;
   const existingClient = await Client.findOne({ email: email });
@@ -52,18 +51,24 @@ const authenticate = async (email, password, expoPushToken) => {
     if (expoPushToken === undefined) {
       return authenticateClient(fetchedClient, password);
     }
-    sendNotification(
-      expoPushToken,
-      "Login Notification",
-      "You have been logged in"
-    );
-    getReceipt(expoPushToken);
+    fetchedClient.expoPushToken = expoPushToken;
+    await fetchedClient.save();
     return authenticateClient(fetchedClient, password);
   }
   if (fetchedHotel != null) {
+    if (expoPushToken === undefined) {
+      return authenticateHotel(fetchedHotel, password);
+    }
+    fetchedHotel.expoPushToken = expoPushToken;
+    await fetchedHotel.save();
     return authenticateHotel(fetchedHotel, password);
   }
   if (fetchedAdmin != null) {
+    if (expoPushToken === undefined) {
+      return authenticateHotel(fetchedAdmin, password);
+    }
+    fetchedAdmin.expoPushToken = expoPushToken;
+    await fetchedAdmin.save();
     return authenticateAdmin(fetchedAdmin, password);
   }
   throw Error("common:Invalid_credentials");

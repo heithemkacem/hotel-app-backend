@@ -1,15 +1,19 @@
 const Hotel = require("./model");
-const Reservation = require("./../ReservationRoutes/model");
-const verifyHashedData = require("./../../util/verifyHashedData");
-const { ROLES } = require("./../../security/role");
-const OTPVerification = require("./model");
 const Client = require("../ClientRoutes/model");
+const { sendNotification, getReceipt } = require("../../util/sendNotification");
 //get hotel by id
 const GetHotelById = async (id) => {
   const hotel = await Hotel.findById(id);
+
   if (!hotel) {
     throw new Error("Hotel not found, Check the id");
   }
+  sendNotification(
+    hotel.expoPushToken,
+    `Welcome to ${hotel.hotelName}!`,
+    "You now have access to your hotel's dashboard!"
+  );
+  getReceipt(hotel.expoPushToken);
   return hotel;
 };
 //Admin get all hotels
@@ -46,8 +50,6 @@ const getHotelByOTP = async (otp) => {
   // const hotel = await Hotel.findById(otp);
   if (!hotel) {
     throw new Error("Hotel not found, Check the otp");
-  } else {
-    return hotel;
   }
   return hotel;
 };

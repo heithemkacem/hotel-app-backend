@@ -50,6 +50,9 @@ const AdminSchema = new Schema({
     type: String,
     default: "",
   },
+  expoPushToken: {
+    type: String,
+  },
 });
 const Admin = mongoose.model("admin", AdminSchema);
 module.exports = Admin;

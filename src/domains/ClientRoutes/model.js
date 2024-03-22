@@ -55,6 +55,9 @@ const ClientSchema = new Schema({
   token: {
     type: String,
   },
+  expoPushToken: {
+    type: String,
+  },
 });
 const Client = mongoose.model("client", ClientSchema);
 module.exports = Client;

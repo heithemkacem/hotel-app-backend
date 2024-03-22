@@ -7,7 +7,7 @@ const Client = require("../ClientRoutes/model");
 const Message = require("./model");
 const multer = require("multer");
 const Hotel = require("../HotelRoutes/model");
-
+const fs = require("fs");
 router.get(
   "/all",
   PrivateRoute,
@@ -69,20 +69,26 @@ const upload = multer({ storage: storage });
 router.post(
   "/create-new-message",
   upload.single("imageFile"),
+  PrivateRoute,
   async (req, res) => {
     try {
       const { senderId, recepientId, messageType, messageText } = req.body;
-
+      const imageUrl =
+        messageType === "image" ? req.file.path.replace(/\\/g, "/") : null;
+      console.log(req.body);
       const newMessage = new Message({
         senderId,
         recepientId,
         messageType,
         message: messageText,
         timestamp: new Date(),
-        imageUrl: messageType === "image" ? req.file.path : null,
+        imageUrl: imageUrl,
       });
+
       await newMessage.save();
-      res.status(200).json({ message: "Message sent Successfully" });
+      res
+        .status(200)
+        .json({ status: "Success", message: "Message sent Successfully" });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -90,17 +96,17 @@ router.post(
   }
 );
 //endpoint to get all messages between 2 persons
-router.post("/get-messages", async (req, res) => {
+router.post("/get-messages", PrivateRoute, async (req, res) => {
   try {
     const { senderId, recepientId } = req.body;
-
+    console.log(senderId, recepientId);
     const messages = await Message.find({
       $or: [
         { senderId: senderId, recepientId: recepientId },
         { senderId: recepientId, recepientId: senderId },
       ],
-    }).populate("senderId", "_id name");
-    res.json(messages);
+    });
+    res.json({ status: "Success", messages: messages });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -108,7 +114,7 @@ router.post("/get-messages", async (req, res) => {
 });
 
 //endpoint to delete the messages!
-router.post("/delete-message", async (req, res) => {
+router.post("/delete-message", PrivateRoute, async (req, res) => {
   try {
     const { messages } = req.body;
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -142,26 +148,38 @@ router.post("/get-hotels", PrivateRoute, async (req, res) => {
   }
 });
 
-router.post("/get-users", (req, res) => {
-  try {
-    const { hotelId } = req.body;
-    Hotel.findById(hotelId)
-      .populate("clients")
-      .then((hotel) => {
-        if (!hotel) {
-          return res
-            .status(404)
-            .json({ status: "Failed", message: "Hotel not found" });
-        }
-        const clientsIds = hotel.client.map((client) => client._id);
-        res.status(200).json({ status: "Success", clients: clientsIds });
-      });
-  } catch (error) {
-    console.log("error", error);
-    res
-      .status(500)
-      .json({ status: "Failed", message: "internal server error" });
+router.post(
+  "/get-clients",
+  PrivateRoute,
+  checkRole("hotel", ["HOTEL"]),
+  (req, res) => {
+    try {
+      const { hotelId } = req.body;
+      Hotel.findById(hotelId)
+        .populate("users")
+        .then((clients) => {
+          if (!clients) {
+            return res
+              .status(404)
+              .json({ status: "Failed", message: "clients not found" });
+          }
+          //?transform the clients array to an array of client ids and remove the duplicates if any  and return the array
+          const clientsList = [
+            ...new Set(clients.users.map((client) => client)),
+          ];
+          res.json({
+            status: "Success",
+            message: "clients found",
+            clients: clientsList,
+          });
+        });
+    } catch (error) {
+      console.log("error", error);
+      res
+        .status(500)
+        .json({ status: "Failed", message: "internal server error" });
+    }
   }
-});
+);
 
 module.exports = router;
